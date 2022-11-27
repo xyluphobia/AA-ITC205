@@ -7,16 +7,18 @@ public class PressureSensor implements IPressureSensor {
 	double pressure;
 	
 	public PressureSensor(double initialPressure) throws PressureException {
-		//TODO - implement method
+		setPressure(initialPressure);
 	}
 	
 	public double getPressure() {
-		//TODO - implement method
-		return 0.0;
+		return pressure;
 	}
 	
 	public void setPressure(double newPressure) throws PressureException {
-		//TODO - implement method
+		if (newPressure < 0.0) {
+			throw new PressureException("Cannot set negative pressure");
+		}
+		this.pressure = newPressure;
 	}
 
 	public String toString() {

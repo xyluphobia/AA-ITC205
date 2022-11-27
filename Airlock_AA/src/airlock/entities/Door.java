@@ -1,41 +1,55 @@
 package airlock.entities;
 
 import airlock.exceptions.DoorException;
+import airlock.exceptions.PressureException;
 
-public class Door implements IDoor{
+public class Door implements IDoor, IPressureSensor{
 	
 	private static double TOLERANCE = 0.001;
 	
 	IPressureSensor inSensor;
-	IPressureSensor exSensor;
+	IPressureSensor exSensor; // has no value
 	
 	private DoorState state;
 	
 	public Door(IPressureSensor exSensor, IPressureSensor inSensor, 
 	            DoorState initialState) throws DoorException {
-		//TODO - implement method
+		if (initialState == DoorState.OPEN && (Math.abs(inSensor.getPressure() - exSensor.getPressure()) > TOLERANCE)) {
+			throw new DoorException("Door initial state cannot be open with difference in pressure is greater than the tolerance");
+		} 
+		this.inSensor = inSensor;
+		this.exSensor = exSensor;
+		this.state = initialState;
 	}
 	
 	@Override
 	public void open() throws DoorException {
-		//TODO - implement method
+		if (state == DoorState.OPEN) {
+			throw new DoorException("Door is already open");
+		} else {
+			if (Math.abs(inSensor.getPressure() - exSensor.getPressure()) > TOLERANCE) {
+				throw new DoorException("Difference in pressure is greater than the tolerance");
+			}
+			state = DoorState.OPEN;
+		}
 	}
 	
 	@Override
 	public void close() throws DoorException {
-		//TODO - implement method
+		if (state == DoorState.CLOSED) {
+			throw new DoorException("Door is already closed");
+		}
+		state = DoorState.CLOSED;
 	}
 
 	@Override
 	public double getExternalPressure() {
-		//TODO - implement method
-		return 0.0;
+		return exSensor.getPressure();
 	}
 
 	@Override
 	public double getInternalPressure() {
-		//TODO - implement method
-		return 0.0;
+		return inSensor.getPressure();
 	}
 
 	@Override
@@ -52,6 +66,16 @@ public class Door implements IDoor{
 		return String.format(
 			"Door: state: %s, external pressure: %3.1f bar, internal pressure: %3.1f bar", 
 			state, exSensor.getPressure(), inSensor.getPressure());
+	}
+
+	@Override
+	public double getPressure() {
+		return inSensor.getPressure();
+	}
+
+	@Override
+	public void setPressure(double newPressure) throws PressureException {
+		inSensor.setPressure(newPressure);
 	}	
 
 }

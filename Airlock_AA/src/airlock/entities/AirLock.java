@@ -15,12 +15,14 @@ public class AirLock implements IAirLock{
 	
 
 	public AirLock(IDoor externalDoor, IDoor internalDoor, IPressureSensor lockSensor) {
-		//TODO - implement method
+		this.outerDoor = externalDoor;
+		this.innerDoor = internalDoor;
+		this.lockSensor = lockSensor;
 	}
 		
 	@Override
 	public void openOuterDoor() throws AirLockException {
-		//TODO - implement method
+	
 	}
 		
 	@Override
