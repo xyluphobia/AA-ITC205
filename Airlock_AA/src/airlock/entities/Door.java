@@ -14,12 +14,17 @@ public class Door implements IDoor, IPressureSensor{
 	
 	public Door(IPressureSensor exSensor, IPressureSensor inSensor, 
 	            DoorState initialState) throws DoorException {
-		if (initialState == DoorState.OPEN && (Math.abs(inSensor.getPressure() - exSensor.getPressure()) > TOLERANCE)) {
-			throw new DoorException("Door initial state cannot be open with difference in pressure is greater than the tolerance");
-		} 
 		this.inSensor = inSensor;
 		this.exSensor = exSensor;
 		this.state = initialState;
+		if (this.inSensor != null && this.exSensor != null) {
+			if (initialState == DoorState.OPEN && (Math.abs(inSensor.getPressure() - exSensor.getPressure()) > TOLERANCE)) {
+				throw new DoorException("Door initial state cannot be open with difference in pressure is greater than the tolerance");
+			} 
+		} else {
+			throw new DoorException("Sensors are non-valid instances of IPressureSensor.");
+		}
+
 	}
 	
 	@Override
@@ -54,12 +59,14 @@ public class Door implements IDoor, IPressureSensor{
 
 	@Override
 	public boolean isOpen() {
-		return state == DoorState.OPEN;
+		if (state == DoorState.OPEN) return true;
+		else return false;
 	}
 
 	@Override
 	public boolean isClosed() {
-		return state == DoorState.CLOSED;
+		if (state == DoorState.CLOSED) return true;
+		else return false;
 	}
 
 	public String toString() {
