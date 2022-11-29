@@ -10,12 +10,13 @@ import airlock.exceptions.PressureException;
 class PressureSensorTest {
 
 	@Test
-	void testConstructorValid() {
+	void testConstructorValid() throws PressureException {
 		try {
 			PressureSensor sensor = new PressureSensor(10.2);
 			assertEquals(10.2, sensor.getPressure());
 		} catch (PressureException e) {
-			e.printStackTrace();
+			fail();
+			throw new PressureException(e);
 		}
 	}
 
@@ -26,6 +27,31 @@ class PressureSensorTest {
 		           () -> new PressureSensor(-1),
 		           "Expected PressureSensor constructor to throw PressureException, but no exception thrown"
 		    );
+	}
+
+	@Test
+	void testGetPressure() throws PressureException {
+		try {
+			PressureSensor sensor = new PressureSensor(6.5);
+			assertEquals(6.5, sensor.getPressure());
+			sensor.setPressure(3.7);
+			assertEquals(3.7, sensor.getPressure());
+		} catch (PressureException e) {
+			throw new PressureException(e);
+		}
+	}
+
+	@Test
+	void testSetPressure() throws PressureException {
+		try {
+			PressureSensor sensor = new PressureSensor(8.4);
+			assertEquals(8.4, sensor.getPressure());
+			assertThrows(PressureException.class, () -> sensor.setPressure(-5.0), "Expected setPressure to throw an exception as negative pressure is not possible. Exception not thrown.");
+			sensor.setPressure(3.7);
+			assertEquals(3.7, sensor.getPressure());
+		} catch (PressureException e) {
+			throw new PressureException(e);
+		}
 	}
 	
 	@Test

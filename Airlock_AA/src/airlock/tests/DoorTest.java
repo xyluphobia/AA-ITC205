@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import airlock.entities.Door;
 import airlock.entities.DoorState;
 import airlock.entities.PressureSensor;
+import airlock.exceptions.AirLockException;
 import airlock.exceptions.DoorException;
 import airlock.exceptions.PressureException;
 
@@ -21,7 +22,7 @@ class DoorTest {
 	}
 	
 	@Test
-	void testValidConstructor1() {
+	void testValidConstructor1() throws AirLockException {
 		try {
 			Door door = new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN);
 			assertEquals(10, door.getExternalPressure());
@@ -39,21 +40,19 @@ class DoorTest {
 			assertEquals(10.001, door.getPressure());
 			assertEquals("Door: state: OPEN, external pressure: 10.0 bar, internal pressure: 10.0 bar", door.toString());
 		} catch (DoorException | PressureException e) {
-			e.printStackTrace();
+			fail();
+			throw new AirLockException(e);
 		}
-
-
 	}
 	
 	@Test
-	void testValidConstructor2() {
+	void testValidConstructor2() throws AirLockException {
 		try {
 			Door door = new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED);
 			door.open();
-		} catch (DoorException e) {
-			e.printStackTrace();
-		} catch (PressureException e) {
-			e.printStackTrace();
+		} catch (DoorException | PressureException e) {
+			fail();
+			throw new AirLockException(e);
 		}
 	}
 	
@@ -66,18 +65,14 @@ class DoorTest {
 	}
 	
 	@Test
-	void testValidOpen() throws DoorException, PressureException {
+	void testValidOpen() throws AirLockException {
 		try {
-			Door door = new Door(new PressureSensor(10), new PressureSensor(12), DoorState.CLOSED);
-			door.open();
+			Door door = new Door(new PressureSensor(10), new PressureSensor(10.001), DoorState.OPEN);
 			assertTrue(door.isOpen());
-		} catch (DoorException e) {
+		} catch (DoorException | PressureException e) {
 			fail();
-			throw new DoorException(e);
-		} catch (PressureException e) {
-			fail();
-			throw new PressureException(e);
-		}
+			throw new AirLockException(e);
+		} 
 	}
 
 	
