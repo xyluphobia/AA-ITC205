@@ -125,6 +125,7 @@ class DoorTest {
 			assertEquals(12, door.getInternalPressure());
 
 		} catch (DoorException | PressureException e) {
+			fail();
 			throw new AirLockException(e);
 		}
 	}
@@ -136,6 +137,7 @@ class DoorTest {
 			assertEquals(10, door.getExternalPressure());
 
 		} catch (DoorException | PressureException e) {
+			fail();
 			throw new AirLockException(e);
 		}
 	}
@@ -159,6 +161,7 @@ class DoorTest {
 			// ensuring it is now closed.
 			
 		} catch (DoorException | PressureException e ) {
+			fail();
 			throw new AirLockException(e);
 		}
 	}
@@ -184,6 +187,7 @@ class DoorTest {
 			assertTrue(door.isOpen());
 
 		} catch (DoorException | PressureException e ) {
+			fail();
 			throw new AirLockException(e);
 		}
 	}
