@@ -13,4 +13,5 @@ public interface IDoor {
 	public boolean isOpen();
 	public boolean isClosed();
 	
+	public double getPressure();
 }
