@@ -16,7 +16,9 @@ public interface IAirLock {
 	void toggleOperationMode() throws AirLockException;
 	
 	boolean isOuterDoorClosed();
+	boolean isOuterDoorOpen();
 	boolean isInnerDoorClosed();
+	boolean isInnerDoorOpen();
 	
 	boolean isSealed();
 	boolean isUnsealed();

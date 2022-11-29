@@ -66,15 +66,17 @@ class DoorTest {
 	}
 	
 	@Test
-	void testValidOpen() {
+	void testValidOpen() throws DoorException, PressureException {
 		try {
 			Door door = new Door(new PressureSensor(10), new PressureSensor(12), DoorState.CLOSED);
 			door.open();
 			assertTrue(door.isOpen());
 		} catch (DoorException e) {
-			e.printStackTrace();
+			fail();
+			throw new DoorException(e);
 		} catch (PressureException e) {
-			e.printStackTrace();
+			fail();
+			throw new PressureException(e);
 		}
 	}
 

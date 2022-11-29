@@ -45,17 +45,37 @@ public class AirLock implements IAirLock{
 		
 	@Override
 	public void closeOuterDoor() throws AirLockException {
-		//TODO - implement method
+		try {
+			outerDoor.close();
+			if (innerDoor.isClosed()) state = AirLockState.SEALED;
+		} catch (DoorException e) {
+			throw new AirLockException(e);
+		}
 	}
 	
 	@Override
 	public void openInnerDoor() throws AirLockException {
-		//TODO - implement method
+		if (innerDoor.isOpen()) throw new AirLockException("Door is already open.");
+		try {
+			if (mode == OperationMode.AUTO) {
+				if (outerDoor.isOpen()) outerDoor.close();
+				lockSensor.setPressure(innerDoor.getInternalPressure());
+			}
+			innerDoor.open();
+			state = AirLockState.UNSEALED;
+		} catch (DoorException | PressureException e) {
+			throw new AirLockException(e);
+		}
 	}
 	
 	@Override
 	public void closeInnerDoor() throws AirLockException {
-		//TODO - implement method
+		try {
+			innerDoor.close();
+			if (outerDoor.isClosed()) state = AirLockState.SEALED;
+		} catch (DoorException e) {
+			throw new AirLockException(e);
+		}
 	}
 	
 	@Override
@@ -79,7 +99,17 @@ public class AirLock implements IAirLock{
 	}
 
 	@Override
+	public boolean isOuterDoorOpen() {
+		return outerDoor.isOpen();
+	}
+
+	@Override
 	public boolean isInnerDoorClosed() {
+		return innerDoor.isClosed();
+	}
+
+	@Override
+	public boolean isInnerDoorOpen() {
 		return innerDoor.isClosed();
 	}
 
