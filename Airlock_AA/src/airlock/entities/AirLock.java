@@ -12,17 +12,40 @@ public class AirLock implements IAirLock{
 	
 	private AirLockState state;	
 	private OperationMode mode;
+
+	IPressureSensor inSensor;
+	IPressureSensor exSensor;
+
+	private DoorState doorState;
+
+	Door door = new Door(exSensor, inSensor, doorState) throws DoorException;
 	
 
-	public AirLock(IDoor externalDoor, IDoor internalDoor, IPressureSensor lockSensor) {
-		this.outerDoor = externalDoor;
-		this.innerDoor = internalDoor;
+	public AirLock(IDoor outerDoor, IDoor innerDoor, IPressureSensor lockSensor) {
+		this.outerDoor = outerDoor;
+		this.innerDoor = innerDoor;
 		this.lockSensor = lockSensor;
+		mode = OperationMode.MANUAL;
+		if (outerDoor.isClosed() && innerDoor.isClosed()) {
+			state = AirLockState.SEALED;
+		} else {
+			state = AirLockState.UNSEALED;
+		}
 	}
 		
 	@Override
 	public void openOuterDoor() throws AirLockException {
-	
+		if (outerDoor.isOpen()) throw new AirLockException("Door is already open.");
+		try {
+			if (mode == OperationMode.AUTO) {
+				if (innerDoor.isOpen()) innerDoor.close();
+				lockSensor = getPressure();
+			}
+			outerDoor.open();
+			state = AirLockState.UNSEALED;
+		} catch (PressureException | DoorException e) {
+			throw new AirLockException(e);
+		}
 	}
 		
 	@Override

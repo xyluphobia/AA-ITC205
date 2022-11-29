@@ -8,7 +8,7 @@ public class Door implements IDoor, IPressureSensor{
 	private static double TOLERANCE = 0.001;
 	
 	IPressureSensor inSensor;
-	IPressureSensor exSensor; // has no value
+	IPressureSensor exSensor;
 	
 	private DoorState state;
 	
