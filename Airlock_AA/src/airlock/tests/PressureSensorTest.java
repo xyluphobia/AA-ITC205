@@ -37,6 +37,7 @@ class PressureSensorTest {
 			sensor.setPressure(3.7);
 			assertEquals(3.7, sensor.getPressure());
 		} catch (PressureException e) {
+			fail();
 			throw new PressureException(e);
 		}
 	}
@@ -50,17 +51,19 @@ class PressureSensorTest {
 			sensor.setPressure(3.7);
 			assertEquals(3.7, sensor.getPressure());
 		} catch (PressureException e) {
+			fail();
 			throw new PressureException(e);
 		}
 	}
 	
 	@Test
-	void testToString() {
+	void testToString() throws PressureException {
 		try {
 			PressureSensor sensor = new PressureSensor(10.2);
 			assertEquals("PressureSensor: pressure: 10.2 bar", sensor.toString());
 		} catch (PressureException e) {
-			e.printStackTrace();
+			fail();
+			throw new PressureException(e);
 		}
 	}
 }
