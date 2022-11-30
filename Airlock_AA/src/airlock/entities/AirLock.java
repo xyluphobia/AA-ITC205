@@ -80,17 +80,33 @@ public class AirLock implements IAirLock{
 	
 	@Override
 	public void equaliseWithCabinPressure() throws AirLockException {
-		//TODO - implement method
-	}
+		if (state != AirLockState.SEALED) throw new AirLockException("Error: Airlock is not sealed.");
+		else {
+			try {
+				lockSensor.setPressure(innerDoor.getInternalPressure());
+			} catch (PressureException e) {
+				throw new AirLockException(e);
+			}
+		}
+	}	
 
 	@Override
 	public void equaliseWithEnvironmentPressure()  throws AirLockException {
-		//TODO - implement method
+		if (state != AirLockState.SEALED) throw new AirLockException("Error: Airlock is not sealed.");
+		else {
+			try {
+				lockSensor.setPressure(outerDoor.getExternalPressure());
+			} catch (PressureException e) {
+				throw new AirLockException(e);
+			}
+		}
 	}
 
 	@Override
 	public void toggleOperationMode() throws AirLockException{
-		//TODO - implement method
+		if (state != AirLockState.SEALED) throw new AirLockException("Error: Airlock is not sealed.");
+		else if (mode == OperationMode.AUTO) mode = OperationMode.MANUAL;
+		else mode = OperationMode.AUTO;
 	}
 	
 	@Override
