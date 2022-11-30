@@ -8,7 +8,7 @@ public class AirLock implements IAirLock{
 	
 	private IDoor outerDoor;
 	private IDoor innerDoor;
-	private IPressureSensor lockSensor;
+	public IPressureSensor lockSensor;
 	
 	private AirLockState state;	
 	private OperationMode mode;
