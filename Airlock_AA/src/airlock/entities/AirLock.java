@@ -126,7 +126,7 @@ public class AirLock implements IAirLock{
 
 	@Override
 	public boolean isInnerDoorOpen() {
-		return innerDoor.isClosed();
+		return innerDoor.isOpen();
 	}
 
 	@Override
