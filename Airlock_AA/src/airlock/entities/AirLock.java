@@ -16,10 +16,11 @@ public class AirLock implements IAirLock{
 	IPressureSensor inSensor;
 	IPressureSensor exSensor;
 
-	public AirLock(IDoor outerDoor, IDoor innerDoor, IPressureSensor lockSensor) {
+	public AirLock(IDoor outerDoor, IDoor innerDoor, IPressureSensor lockSensor) throws DoorException {
 		this.outerDoor = outerDoor;
 		this.innerDoor = innerDoor;
 		this.lockSensor = lockSensor;
+		if (outerDoor == null|| innerDoor == null) throw new DoorException("Door's are non-valid inputs of Door.");
 		mode = OperationMode.MANUAL;
 		if (outerDoor.isClosed() && innerDoor.isClosed()) {
 			state = AirLockState.SEALED;

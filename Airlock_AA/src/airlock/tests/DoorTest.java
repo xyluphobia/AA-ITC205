@@ -27,6 +27,13 @@ class DoorTest {
 	}
 
 	@Test
+	@DisplayName("Ensures a DoorException is thrown if door is initalised with null values for PressureSensors.")
+	void testConstructorThrowsExceptionIfGivenNullPressureSensorValues() throws AirLockException {
+		assertThrows(DoorException.class, () -> new Door(null, null, DoorState.CLOSED),
+		"Expected Constructor to throw a DoorException due to sensor inputs being null, no exception given.");
+	}
+
+	@Test
 	@DisplayName("Ensures a PressureException is thrown if door is initalised with invalid values for PressureSensors.")
 	void testConstructorThrowsExceptionIfGivenInvalidPressureSensorValues() throws AirLockException {
 		assertThrows(PressureException.class, () -> new Door(new PressureSensor(-2), new PressureSensor(0), DoorState.CLOSED),
@@ -53,7 +60,7 @@ class DoorTest {
 	@DisplayName("Ensures that open throws an exception if called when external and internal pressure difference is greater than tolerance.")
 	void testOpenThrowsExceptionIfPressureDifferenceGreaterThanTolerance() throws AirLockException {
 		try {
-			Door door = new Door(new PressureSensor(10), new PressureSensor(12), DoorState.OPEN);
+			Door door = new Door(new PressureSensor(10), new PressureSensor(15), DoorState.CLOSED);
 			assertThrows(DoorException.class, () -> door.open(),
 			"Expected Door open to throw DoorException for opening when pressure difference > tolerance, but no exception is thrown.");
 
