@@ -2,6 +2,7 @@ package airlock.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import airlock.entities.Door;
@@ -15,6 +16,7 @@ import airlock.exceptions.PressureException;
 public class AirLockTest {
 
     @Test
+    @DisplayName("")
     void testConstructor() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
@@ -28,12 +30,12 @@ public class AirLockTest {
             assertTrue(airlock2.isSealed());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testOpenOuterDoor() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
@@ -85,12 +87,12 @@ public class AirLockTest {
             // Ensures that while in AUTO mode, if pressure is equalised and innerDoor is closed, the outerDoor is opened when openOuterDoor is called.
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testOpenInnerDoor() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -142,12 +144,12 @@ public class AirLockTest {
             // Ensures that while in AUTO mode, if pressure is equalised and outerDoor is closed, the innerDoor is opened when openInnerDoor is called.
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testCloseOuterDoor() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -169,12 +171,12 @@ public class AirLockTest {
             assertTrue(airlock.isSealed());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testCloseInnerDoor() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -192,12 +194,12 @@ public class AirLockTest {
             assertTrue(airlock.isSealed());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testEqualiseWithEnviromentPressure() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -213,12 +215,12 @@ public class AirLockTest {
             assertEquals(1, airlock2.lockSensor.getPressure());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testEqualiseWithCabinPressure() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -234,12 +236,12 @@ public class AirLockTest {
             assertEquals(4.0, airlock2.lockSensor.getPressure());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testToggleOperationMode() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -256,12 +258,12 @@ public class AirLockTest {
             assertTrue(airlock.isInAutoMode());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testIsInManualMode() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -273,12 +275,12 @@ public class AirLockTest {
             assertFalse(airlock.isInManualMode());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testIsInAutoMode() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -290,12 +292,12 @@ public class AirLockTest {
             assertTrue(airlock.isInAutoMode());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 
     @Test
+    @DisplayName("")
     void testIsOuterDoorClosed() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -307,12 +309,12 @@ public class AirLockTest {
             assertFalse(airlock.isOuterDoorClosed());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
     
     @Test
+    @DisplayName("")
     void testIsInnerDoorClosed() throws AirLockException {
         try {
             AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
@@ -324,8 +326,7 @@ public class AirLockTest {
             assertFalse(airlock.isInnerDoorClosed());
 
         } catch (DoorException | PressureException e) {
-            fail();
-            throw new AirLockException(e);
+            fail(e);
         }
     }
 }
