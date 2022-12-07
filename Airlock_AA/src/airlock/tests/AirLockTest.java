@@ -2,11 +2,15 @@ package airlock.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.management.LockInfo;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import airlock.entities.Door;
 import airlock.entities.DoorState;
+import airlock.entities.IDoor;
+import airlock.entities.IPressureSensor;
 import airlock.entities.AirLock;
 import airlock.entities.PressureSensor;
 import airlock.exceptions.AirLockException;
@@ -19,8 +23,13 @@ public class AirLockTest {
     @DisplayName("Ensures Airlock initialises a valid constructor if all inputs are valid.")
     void testConstructorInitalisesValid() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertInstanceOf(AirLock.class, airlock);
 
@@ -40,10 +49,15 @@ public class AirLockTest {
     @DisplayName("Ensures Airlock initialises in the sealed state if both doors are closed.")
     void testConstructorInitalisesStateSealed() throws AirLockException {
         try {
-            AirLock airlock2 = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
             
-            assertTrue(airlock2.isSealed());
+            assertTrue(airlock.isSealed());
 
         } catch (DoorException | PressureException e) {
             fail(e);
@@ -54,8 +68,13 @@ public class AirLockTest {
     @DisplayName("Ensures Airlock initialises in the unsealed state if a door is open.")
     void testConstructorInitalisesStateUnsealed() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertTrue(airlock.isUnsealed());
 
@@ -68,8 +87,13 @@ public class AirLockTest {
     @DisplayName("Ensures Airlock initialises in manual mode.")
     void testConstructorInitalisesModeManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertTrue(airlock.isInManualMode());
 
@@ -82,8 +106,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the doorException caused by opening an already open door is encapsulated by an AirLockException and is thrown.")
     void testOpenOuterDoorThrowsExceptionIfAlreadyOpen() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertThrows(AirLockException.class, () -> airlock.openOuterDoor(), 
             "Expected to throw an AirLockException due to attempting to open the outerDoor while it is already open. Exception not thrown.");
@@ -97,8 +126,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in operation mode AUTO, attempting to open the OuterDoor while the innerDoor is open results in the closing of the innerDoor.")
     void testOpenOuterDoorAutoModeClosesInnerDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto.
             airlock.openInnerDoor(); // must be set after toggling operation mode as toggleOperationMode throws an error if the airlock is not sealed.
@@ -114,8 +148,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure.")
     void testOpenOuterDoorPressureEqualisationAttemptIsMade() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10.001), new PressureSensor(10.001), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(15));
+            IPressureSensor enviromentSensor = new PressureSensor(10.001);
+            IPressureSensor lockSensor = new PressureSensor(10.001);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
             airlock.openOuterDoor();
@@ -131,8 +170,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in AUTO mode, if pressure is equalised and innerDoor is closed, the outerDoor is opened when openOuterDoor is called.")
     void testOpenOuterDoorAuto() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode();
             airlock.openOuterDoor();
@@ -147,8 +191,13 @@ public class AirLockTest {
     @DisplayName("Ensures that openOuterDoor attempts to open the OuterDoor while in MANUAL mode.")
     void testOpenOuterDoorOpensDoorInManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openOuterDoor();
             assertTrue(airlock.isOuterDoorOpen());
@@ -162,8 +211,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in MANUAL mode, if pressure is equalised and innerDoor is closed, the outerDoor is opened when openOuterDoor is called.")
     void testOpenOuterDoorManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openOuterDoor();
             assertTrue(airlock.isOuterDoorOpen());
@@ -177,8 +231,13 @@ public class AirLockTest {
     @DisplayName("Ensures that after calling OpenOuterDoor on a valid door, the airlock state becomes UNSEALED.")
     void testOpenOuterDoorMakesAirlockUnsealed() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openOuterDoor();
             assertTrue(airlock.isUnsealed());
@@ -192,8 +251,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the airlock remains sealed even when exceptions are thrown.")
     void testOpenOuterDoorAirlockSealedThroughException() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(3), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(15));
+            IPressureSensor enviromentSensor = new PressureSensor(3);
+            IPressureSensor lockSensor = new PressureSensor(15);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
             assertThrows(AirLockException.class, () -> airlock.openOuterDoor(), 
@@ -209,8 +273,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the doorException caused by opening an already open door is encapsulated by an AirLockException and is thrown.")
     void testOpenInnerDoorThrowsExceptionIfOpeningOpenDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertThrows(AirLockException.class, () -> airlock.openInnerDoor(), 
             "Expected to throw an AirLockException due to attempting to open the innerDoor while it is already open. Exception not thrown.");
@@ -224,8 +293,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in operation mode AUTO, attempting to open the innerDoor while the outerDoor is open results in the closing of the outerDoor.")
     void testOpenInnerDoorClosesInnerDoorInAuto() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // set mode to auto
             airlock.openInnerDoor(); // must be set after toggling operation mode as toggleOperationMode throws an error if the airlock is not sealed.
@@ -240,8 +314,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure.")
     void testOpenInnerDoorPressureEqualisationAttemptIsMade() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10.001), new PressureSensor(10.001), DoorState.CLOSED), new PressureSensor(15));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10.001);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
             airlock.openInnerDoor();
@@ -257,8 +336,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in AUTO mode, if pressure is equalised and innerDoor is closed, the InnerDoor is opened when openInnerDoor is called.")
     void testOpenInnerDoorAuto() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode();
             airlock.openInnerDoor();
@@ -273,8 +357,13 @@ public class AirLockTest {
     @DisplayName("Ensures that openInnerDoor attempts to open the InnerDoor while in MANUAL mode.")
     void testOpenInnerDoorOpensDoorInManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openInnerDoor();
             assertTrue(airlock.isInnerDoorOpen());
@@ -288,8 +377,13 @@ public class AirLockTest {
     @DisplayName("Ensures that while in MANUAL mode, if pressure is equalised and OuterDoor is closed, the InnerDoor is opened when openInnerDoor is called.")
     void testOpenInnerDoorManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openInnerDoor();
             assertTrue(airlock.isInnerDoorOpen());
@@ -303,8 +397,13 @@ public class AirLockTest {
     @DisplayName("Ensures that after calling OpenInnerDoor on a valid door, the airlock state becomes UNSEALED.")
     void testOpenInneroorMakesAirlockUnsealed() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openInnerDoor();
             assertTrue(airlock.isUnsealed());
@@ -318,8 +417,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the airlock remains sealed even when exceptions are thrown.")
     void testOpenInnerDoorAirlockSealedThroughException() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(3), new PressureSensor(65), DoorState.CLOSED), 
-            new Door(new PressureSensor(5), new PressureSensor(100), DoorState.CLOSED), new PressureSensor(15));
+            IPressureSensor enviromentSensor = new PressureSensor(3);
+            IPressureSensor lockSensor = new PressureSensor(15);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
             assertThrows(AirLockException.class, () -> airlock.openInnerDoor(), 
@@ -335,8 +439,13 @@ public class AirLockTest {
     @DisplayName("Ensures that closeOuterDoor attempts to close outer door.")
     void testCloseOuterDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.closeOuterDoor();
             assertTrue(airlock.isOuterDoorClosed());
@@ -350,8 +459,13 @@ public class AirLockTest {
     @DisplayName("Ensures closeOuterDoor sets the airlock to sealed if inner door is also closed.")
     void testCloseOuterDoorSeals() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.closeOuterDoor();
             assertTrue(airlock.isSealed());
@@ -365,8 +479,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the doorException caused by closing an already closed door is encapsulated by an AirLockException and is thrown.")
     void testCloseOuterDoorThrowsExceptionClosingAClosedDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertThrows(AirLockException.class, () -> airlock.closeOuterDoor(), 
             "Expected to throw an AirLockException due to attempting to close the outerDoor while it is already closed. Exception not thrown.");
@@ -380,8 +499,13 @@ public class AirLockTest {
     @DisplayName("Ensures that closeInnerDoor attempts to close Inner door.")
     void testCloseInnerDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.closeInnerDoor();
             assertTrue(airlock.isInnerDoorClosed());
@@ -395,8 +519,13 @@ public class AirLockTest {
     @DisplayName("Ensures closeInnerDoor sets the airlock to sealed if Outer door is also closed.")
     void testCloseInnerDoorSeals() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.closeInnerDoor();
             assertTrue(airlock.isSealed());
@@ -410,9 +539,13 @@ public class AirLockTest {
     @DisplayName("Ensures that the doorException caused by closing an already closed door is encapsulated by an AirLockException and is thrown.")
     void testCloseInnerDoorThrowsExceptionClosingAClosedDoor() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
 
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
             assertThrows(AirLockException.class, () -> airlock.closeInnerDoor(), 
             "Expected to throw an AirLockException due to attempting to close the InnerDoor while it is already closed. Exception not thrown.");
 
@@ -425,8 +558,13 @@ public class AirLockTest {
     @DisplayName("Ensures that equaliseWithEnviromentPressure throws AirlockNotSealedException if it is called when airlock is not SEALED")
     void testEqualiseWithEnviromentPressureThrowsAirlockNotSealedException() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertThrows(AirLockException.class, () -> airlock.equaliseWithCabinPressure(), 
             "Expected to throw an AirlockException due to attempting to equalise pressure while the airlock is not sealed. Exception not thrown.");
@@ -440,8 +578,13 @@ public class AirLockTest {
     @DisplayName("Ensure that, if valid, the lock pressure is set to the same as the exterior enviroment pressure.")
     void testEqualiseWithEnviromentPressure() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(1), new PressureSensor(2), DoorState.CLOSED), 
-            new Door(new PressureSensor(3), new PressureSensor(4), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(1);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(4);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.equaliseWithEnvironmentPressure();
             assertEquals(1, airlock.lockSensor.getPressure());
@@ -470,11 +613,16 @@ public class AirLockTest {
     @DisplayName("Ensure that, if valid, the lock pressure is set to the same as the interior cabin pressure.")
     void testEqualiseWithCabinPressure() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(1), new PressureSensor(2), DoorState.CLOSED), 
-            new Door(new PressureSensor(3), new PressureSensor(4), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(1);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10.001);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.equaliseWithCabinPressure();
-            assertEquals(4.0, airlock.lockSensor.getPressure());
+            assertEquals(10.001, lockSensor.getPressure());
 
         } catch (DoorException | PressureException e) {
             fail(e);
@@ -485,8 +633,13 @@ public class AirLockTest {
     @DisplayName("Ensure toggleOperationMode throws an airlockexception if it is called while the airlock is not SEALED.")
     void testToggleOperationModeThrowsException() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.openOuterDoor();
             assertThrows(AirLockException.class, () -> airlock.toggleOperationMode(), 
@@ -501,8 +654,13 @@ public class AirLockTest {
     @DisplayName("Ensures that when valid, toggleOperationMode correctly changes the operation mode.")
     void testToggleOperationMode() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode();
             assertTrue(airlock.isInAutoMode());
@@ -519,8 +677,13 @@ public class AirLockTest {
     @DisplayName("Ensure that isManualMode returns True if the airlock is in MANUAL mode.")
     void testIsInManualModeWhenManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertTrue(airlock.isInManualMode());
 
@@ -533,8 +696,13 @@ public class AirLockTest {
     @DisplayName("Ensure that isManualMode returns False if the airlock is in AUTO mode.")
     void testIsInManualModeWhenAuto() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode();
             assertFalse(airlock.isInManualMode());
@@ -548,8 +716,13 @@ public class AirLockTest {
     @DisplayName("Ensure that isAutoMode returns True if the airlock is in AUTO mode.")
     void testIsInAutoModeWhenManual() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertFalse(airlock.isInAutoMode());
 
@@ -562,8 +735,13 @@ public class AirLockTest {
     @DisplayName("Ensure that isAutoMode returns False if the airlock is in MANUAL mode.")
     void testIsInAutoModeWhenAuto() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertFalse(airlock.isInAutoMode());
 
@@ -579,8 +757,13 @@ public class AirLockTest {
     @DisplayName("Ensure isOuterDoorClosed returns True if the outerDoor is closed.")
     void testIsOuterDoorClosedWhenTrue() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertTrue(airlock.isOuterDoorClosed());
 
@@ -593,8 +776,13 @@ public class AirLockTest {
     @DisplayName("Ensure isOuterDoorClosed returns False if the outerDoor is open.")
     void testIsOuterDoorClosedWhenFalse() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.OPEN);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertFalse(airlock.isOuterDoorClosed());
 
@@ -607,8 +795,13 @@ public class AirLockTest {
     @DisplayName("Ensure isInnerDoorClosed returns True if the innerDoor is closed.")
     void testIsInnerDoorClosedWhenTrue() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertTrue(airlock.isInnerDoorClosed());
 
@@ -621,8 +814,13 @@ public class AirLockTest {
     @DisplayName("Ensure isInnerDoorClosed returns False if the innerDoor is open.")
     void testIsInnerDoorClosedWhenFalse() throws AirLockException {
         try {
-            AirLock airlock = new AirLock(new Door(new PressureSensor(10), new PressureSensor(10), DoorState.CLOSED), 
-            new Door(new PressureSensor(10), new PressureSensor(10), DoorState.OPEN), new PressureSensor(10));
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(10);
+            IPressureSensor cabinSensor = new PressureSensor(10);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.OPEN);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             assertFalse(airlock.isInnerDoorClosed());
 

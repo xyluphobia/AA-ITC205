@@ -5,7 +5,7 @@ import airlock.exceptions.PressureException;
 
 public class Door implements IDoor, IPressureSensor{
 	
-	private static double TOLERANCE = 0.001;
+	public static double TOLERANCE = 0.001;
 	
 	IPressureSensor inSensor;
 	IPressureSensor exSensor;
