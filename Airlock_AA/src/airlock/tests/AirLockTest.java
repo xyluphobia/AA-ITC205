@@ -2,8 +2,6 @@ package airlock.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.lang.management.LockInfo;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -145,24 +143,50 @@ public class AirLockTest {
     }
 
     @Test
-    @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure.")
-    void testOpenOuterDoorPressureEqualisationAttemptIsMade() throws AirLockException {
+    @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure when opening outer door.")
+    void testOpenOuterDoorPressureEqualisationAttemptIsMadeEnviromentLess() throws AirLockException {
         try {
-            IPressureSensor enviromentSensor = new PressureSensor(10.001);
-            IPressureSensor lockSensor = new PressureSensor(10.001);
-            IPressureSensor cabinSensor = new PressureSensor(10);
-            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IPressureSensor environmentSensor = new PressureSensor(10.0);
+            IPressureSensor lockSensor = new PressureSensor(15.0);
+            IPressureSensor cabinSensor = new PressureSensor(12.0);
+            IDoor outerDoor = new Door(environmentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
 
-            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
+            AirLock airlock = new AirLock( outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
             airlock.openOuterDoor();
+
             assertEquals("PressureSensor: pressure: 10.0 bar", airlock.lockSensor.toString());
 
+        } catch (DoorException | PressureException e) {
+
+            fail(e);
+
+        }
+    }
+
+    @Test
+    @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure when opening outer door.")
+    void testOpenOuterDoorPressureEqualisationAttemptIsMadeEnviromentGreater() throws AirLockException {
+        try {
+            IPressureSensor environmentSensor = new PressureSensor(20.0);
+            IPressureSensor lockSensor = new PressureSensor(15.0);
+            IPressureSensor cabinSensor = new PressureSensor(12.0);
+            IDoor outerDoor = new Door(environmentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock( outerDoor, innerDoor, lockSensor);
+
+            airlock.toggleOperationMode(); // setting mode to auto
+            airlock.openOuterDoor();
+
+            assertEquals("PressureSensor: pressure: 20.0 bar", airlock.lockSensor.toString());
 
         } catch (DoorException | PressureException e) {
+
             fail(e);
+
         }
     }
 
@@ -312,11 +336,11 @@ public class AirLockTest {
 
     @Test
     @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure.")
-    void testOpenInnerDoorPressureEqualisationAttemptIsMade() throws AirLockException {
+    void testOpenInnerDoorPressureEqualisationAttemptIsMadeCabinGreater() throws AirLockException {
         try {
             IPressureSensor enviromentSensor = new PressureSensor(10);
-            IPressureSensor lockSensor = new PressureSensor(10);
-            IPressureSensor cabinSensor = new PressureSensor(10.001);
+            IPressureSensor lockSensor = new PressureSensor(15);
+            IPressureSensor cabinSensor = new PressureSensor(20);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
 
@@ -324,7 +348,29 @@ public class AirLockTest {
 
             airlock.toggleOperationMode(); // setting mode to auto
             airlock.openInnerDoor();
-            assertEquals("PressureSensor: pressure: 10.0 bar", airlock.lockSensor.toString());
+            assertEquals("PressureSensor: pressure: 20.0 bar", airlock.lockSensor.toString());
+
+
+        } catch (DoorException | PressureException e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    @DisplayName("Ensures that while in AUTO mode, an attempt is made to equalise pressure.")
+    void testOpenInnerDoorPressureEqualisationAttemptIsMadeCabinLess() throws AirLockException {
+        try {
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(15);
+            IPressureSensor cabinSensor = new PressureSensor(12);
+            IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
+            IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
+
+            AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
+
+            airlock.toggleOperationMode(); // setting mode to auto
+            airlock.openInnerDoor();
+            assertEquals("PressureSensor: pressure: 12.0 bar", airlock.lockSensor.toString());
 
 
         } catch (DoorException | PressureException e) {
