@@ -77,7 +77,7 @@ public class Door implements IDoor, IPressureSensor{
 
 	@Override
 	public double getPressure() {
-		return inSensor.getPressure();
+		return exSensor.getPressure();
 	}
 
 	@Override

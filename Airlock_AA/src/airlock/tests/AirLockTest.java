@@ -275,17 +275,16 @@ public class AirLockTest {
     @DisplayName("Ensures that the airlock remains sealed even when exceptions are thrown.")
     void testOpenOuterDoorAirlockSealedThroughException() throws AirLockException {
         try {
-            IPressureSensor enviromentSensor = new PressureSensor(3);
-            IPressureSensor lockSensor = new PressureSensor(15);
-            IPressureSensor cabinSensor = new PressureSensor(10);
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(1);
+            IPressureSensor cabinSensor = new PressureSensor(20);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
 
             AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
-            airlock.toggleOperationMode(); // setting mode to auto
-            assertThrows(AirLockException.class, () -> airlock.openOuterDoor(), 
-            "Expected to throw an AirLockException due to attempting to open the outerDoor while the pressure difference is > tolerance. Exception not thrown.");
+            assertThrows(AirLockException.class, () -> airlock.closeOuterDoor(), 
+            "Expected to throw an AirLockException due to attempting to close outer door while it is already closed. Exception not thrown.");
             assertTrue(airlock.isSealed());
 
         } catch (DoorException | PressureException e) {
@@ -461,19 +460,19 @@ public class AirLockTest {
 
     @Test
     @DisplayName("Ensures that the airlock remains sealed even when exceptions are thrown.")
-    void testOpenInnerDoorAirlockSealedThroughException() throws AirLockException {
+    void testCloseInnerDoorAirlockSealedThroughException() throws AirLockException {
         try {
-            IPressureSensor enviromentSensor = new PressureSensor(3);
-            IPressureSensor lockSensor = new PressureSensor(15);
-            IPressureSensor cabinSensor = new PressureSensor(10);
+            IPressureSensor enviromentSensor = new PressureSensor(10);
+            IPressureSensor lockSensor = new PressureSensor(0);
+            IPressureSensor cabinSensor = new PressureSensor(20);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
 
             AirLock airlock = new AirLock(outerDoor, innerDoor, lockSensor);
 
             airlock.toggleOperationMode(); // setting mode to auto
-            assertThrows(AirLockException.class, () -> airlock.openInnerDoor(), 
-            "Expected to throw an AirLockException due to attempting to open the InnerDoor while the pressure difference is > tolerance. Exception not thrown.");
+            assertThrows(AirLockException.class, () -> airlock.closeInnerDoor(), 
+            "Expected to throw an AirLockException due to attempting to close the InnerDoor while the door is already closed. Exception not thrown.");
             assertTrue(airlock.isSealed());
 
         } catch (DoorException | PressureException e) {

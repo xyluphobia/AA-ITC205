@@ -7,7 +7,7 @@ import airlock.exceptions.PressureException;
 public class AirLock implements IAirLock{
 	
 	private IDoor outerDoor;
-	private IDoor innerDoor;
+	public IDoor innerDoor;
 	public IPressureSensor lockSensor;
 	
 	private AirLockState state;	
@@ -34,10 +34,14 @@ public class AirLock implements IAirLock{
 		if (outerDoor.isOpen()) throw new AirLockException("Door is already open.");
 		try {
 			if (mode == OperationMode.AUTO) {
-				if (innerDoor.isOpen()) innerDoor.close();
+				if (isInnerDoorOpen()) { 
+					closeInnerDoor();
+				}
 				equaliseWithEnvironmentPressure();
-				if (outerDoor.getInternalPressure() - outerDoor.getExternalPressure() > 0.001) {
-					throw new AirLockException("Pressure difference is too great. Cannot open.");
+				if (outerDoor.getInternalPressure() - outerDoor.getExternalPressure() != 0) {
+					if (outerDoor.getInternalPressure() - outerDoor.getExternalPressure() > 0.001 || outerDoor.getInternalPressure() - outerDoor.getExternalPressure() < -0.001) {
+						throw new AirLockException("Pressure difference is too great. Cannot open.");
+					}
 				}
 				lockSensor.setPressure(outerDoor.getExternalPressure());
 			}
@@ -52,7 +56,10 @@ public class AirLock implements IAirLock{
 	public void closeOuterDoor() throws AirLockException {
 		try {
 			outerDoor.close();
-			if (innerDoor.isClosed()) state = AirLockState.SEALED;
+			if (isInnerDoorClosed()) {
+				state = AirLockState.SEALED;
+				equaliseWithCabinPressure();
+			}
 		} catch (DoorException e) {
 			throw new AirLockException(e);
 		}
@@ -63,10 +70,15 @@ public class AirLock implements IAirLock{
 		if (innerDoor.isOpen()) throw new AirLockException("Door is already open.");
 		try {
 			if (mode == OperationMode.AUTO) {
-				if (outerDoor.isOpen()) outerDoor.close();
+				if (isOuterDoorOpen()) {
+					closeOuterDoor();
+				}
 				equaliseWithCabinPressure();
-				if (outerDoor.getExternalPressure() - outerDoor.getInternalPressure() > 0.001) { 
-					throw new AirLockException("Pressure difference is too great. Cannot open.");
+				System.out.println(innerDoor.getInternalPressure() - innerDoor.getExternalPressure() != 0);
+				if (innerDoor.getInternalPressure() - innerDoor.getExternalPressure() != 0) {
+					if (innerDoor.getExternalPressure() - innerDoor.getInternalPressure() > 0.001 || innerDoor.getExternalPressure() - innerDoor.getInternalPressure() < -0.001) { 
+						throw new AirLockException("Pressure difference is too great. Cannot open.");
+					}
 				}
 				lockSensor.setPressure(innerDoor.getInternalPressure());
 			}
@@ -81,7 +93,10 @@ public class AirLock implements IAirLock{
 	public void closeInnerDoor() throws AirLockException {
 		try {
 			innerDoor.close();
-			if (outerDoor.isClosed()) state = AirLockState.SEALED;
+			if (isOuterDoorClosed()) {
+				state = AirLockState.SEALED;
+				equaliseWithCabinPressure();
+			}
 		} catch (DoorException e) {
 			throw new AirLockException(e);
 		}
