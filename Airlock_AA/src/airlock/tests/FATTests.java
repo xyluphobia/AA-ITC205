@@ -22,7 +22,7 @@ public class FATTests {
     void TestAirlockAutoInToOutExternalLessThanInternal() throws AirLockException {
         try {
             IPressureSensor enviromentSensor = new PressureSensor(10);
-            IPressureSensor lockSensor = new PressureSensor(12);
+            IPressureSensor lockSensor = new PressureSensor(1);
             IPressureSensor cabinSensor = new PressureSensor(13);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
@@ -49,7 +49,7 @@ public class FATTests {
     void TestAirlockAutoOutToInExternalMoreThanInternal() throws AirLockException {
         try {
             IPressureSensor enviromentSensor = new PressureSensor(12);
-            IPressureSensor lockSensor = new PressureSensor(11);
+            IPressureSensor lockSensor = new PressureSensor(1);
             IPressureSensor cabinSensor = new PressureSensor(10);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
@@ -76,7 +76,7 @@ public class FATTests {
     void TestAirlockManualInToOutExternalMoreThanInternal() throws AirLockException {
         try {
             IPressureSensor enviromentSensor = new PressureSensor(12);
-            IPressureSensor lockSensor = new PressureSensor(11);
+            IPressureSensor lockSensor = new PressureSensor(1);
             IPressureSensor cabinSensor = new PressureSensor(10);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);
@@ -101,10 +101,10 @@ public class FATTests {
 
     @Test
     @DisplayName("Pass through airlock in manual mode from outside to inside when external enviroment pressure is less than internal cabin pressure.")
-    void TestAirlockManualOutToInExternalLesshanInternal() throws AirLockException {
+    void TestAirlockManualOutToInExternalLessThanInternal() throws AirLockException {
         try {
             IPressureSensor enviromentSensor = new PressureSensor(10);
-            IPressureSensor lockSensor = new PressureSensor(11);
+            IPressureSensor lockSensor = new PressureSensor(1);
             IPressureSensor cabinSensor = new PressureSensor(12);
             IDoor outerDoor = new Door(enviromentSensor, lockSensor, DoorState.CLOSED);
             IDoor innerDoor = new Door(cabinSensor, lockSensor, DoorState.CLOSED);

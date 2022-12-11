@@ -74,7 +74,6 @@ public class AirLock implements IAirLock{
 					closeOuterDoor();
 				}
 				equaliseWithCabinPressure();
-				System.out.println(innerDoor.getInternalPressure() - innerDoor.getExternalPressure() != 0);
 				if (innerDoor.getInternalPressure() - innerDoor.getExternalPressure() != 0) {
 					if (innerDoor.getExternalPressure() - innerDoor.getInternalPressure() > 0.001 || innerDoor.getExternalPressure() - innerDoor.getInternalPressure() < -0.001) { 
 						throw new AirLockException("Pressure difference is too great. Cannot open.");
